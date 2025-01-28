@@ -276,8 +276,8 @@ class SmilesTokeniser:
             self._logger.info(f"Token {token_str} weight calculated using 'linear blend' of weights")
 
         # Normalise weights by dividing all weights by the overall average so that average weight is 1.0
-        ## mean_weight = weights_array.mean()
-        ## weights_array /= mean_weight
+        mean_weight = weights_array.mean()
+        weights_array /= mean_weight
 
         self._logger.info(f"Token-to-weight map successfully built")
 
