@@ -1,6 +1,6 @@
 # Seq2Seq Model Architecture
 #
-# - Run full model training run with Pande et al. hyperparameters to test EarlyStop callback and monitor unthrottled
+# - Run full model training run with Liu et al. hyperparameters to test EarlyStop callback and monitor unthrottled
 #   test performance metrics.
 #
 # Training run metrics:

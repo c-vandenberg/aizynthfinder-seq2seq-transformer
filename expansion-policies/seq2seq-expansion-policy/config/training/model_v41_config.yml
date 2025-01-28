@@ -1,0 +1,105 @@
+# Seq2Seq Model Architecture
+# -
+#
+# Training run metrics:
+#   - Epochs: 10
+#
+#   - Train Loss (Smoothed):
+#   - Train Accuracy (Smoothed):
+#   - Train Perplexity (Smoothed):
+#
+#   - Validation Loss (Smoothed):
+#   - Validation Accuracy (Smoothed):
+#   - Validation Perplexity (Smoothed):
+#   - Validation BLEU Score (Smoothed):
+#
+#   - Test Loss (Smoothed):
+#   - Test Accuracy (Smoothed):
+#   - Test Perplexity (Smoothed):
+#   - Test BLEU Score (Smoothed):
+#
+# Training Performance Evaluation
+# 1. Training vs Validation Accuracy, Loss, Perplexity and BLEU Score:
+#     - Train Accuracy:
+#     - Validation Accuracy:
+#     - Difference:
+#
+#     - Train Loss:
+#     - Validation Loss:
+#     - Difference:
+#
+#     - Train Perplexity:
+#     - Validation Perplexity:
+#     - Difference:
+#
+#
+# 2. Validation vs Testing Accuracy, Loss, Perplexity and BLEU Score:
+#   - Validation Accuracy:
+#   - Testing Accuracy:
+#   - Difference:
+#
+#   - Validation Loss:
+#   - Testing Loss:
+#   - Difference:
+#
+#   - Validation Perplexity:
+#   - Testing Perplexity:
+#   - Difference:
+#
+#   - Validation BLEU Score:
+#   - Testing BLEU Score:
+#   - Difference:
+#
+
+# Data Configuration and Hyperparameters
+data:
+  products_file: '../data/preprocessed/liu-et-al-ord-concatenated/products_smiles_cleaned_smarts'
+  reactants_file: '../data/preprocessed/liu-et-al-ord-concatenated/reactants_smiles_cleaned_smarts'
+  tokenizer_save_path: '../data/training/liu-et-al-ord-concatenated/model-v41/tokenizer/model_v41_tokenizer.json'
+  logger_path: '../var/log/liu-et-al-ord-concatenated/model-v41/model-v41.log'
+  max_encoder_seq_length: 140
+  max_decoder_seq_length: 140
+  batch_size: 32
+  test_split: 0.1
+  validation_split: 0.1
+  max_tokens: 350
+  use_weighted_loss: True
+  random_state: 4
+
+# Model Configuration and Hyperparameters
+model:
+  input_vocab_size: null  # To be set dynamically based on tokenizer
+  output_vocab_size: null  # To be set dynamically based on tokenizer
+  attention_dim: 256
+  encoder_embedding_dim: 256
+  decoder_embedding_dim: 256
+  units: 256
+  encoder_num_layers: 2
+  decoder_num_layers: 4
+  beam_width: 5
+  weight_decay: null
+  dropout_rate: 0.2
+  learning_rate: 0.0001
+
+# Training Configuration and Hyperparameters
+training:
+  epochs: 20
+  patience: 5
+  reverse_tokenized_input_sequence: True
+  model_save_path: '../data/training/liu-et-al-ord-concatenated/model-v41/model/saved_model'
+  model_save_dir: '../data/training/liu-et-al-ord-concatenated/model-v41/model'
+  valid_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v41/validation-metrics'
+  test_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v41/testing-metrics'
+  tensorboard_dir: '../data/training/liu-et-al-ord-concatenated/model-v41/tensorboard'
+  log_dir: '../logs/liu-et-al-ord-concatenated/model-v41'
+  checkpoint_dir: '../data/training/liu-et-al-ord-concatenated/model-v41/checkpoints'
+  num_samples: null # Number of samples to use for debugging model
+  test_subset_fraction: 0.01
+
+# Environment Configuration
+env:
+  determinism:
+    python_seed: "44478977"
+    random_seed: 440651
+    numpy_seed: 110789
+    tf_seed: 61592
