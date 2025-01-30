@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import List, Tuple, Optional
 
 import tensorflow as tf
@@ -33,13 +34,13 @@ class DataLoader:
     get_test_dataset()
         Returns the test dataset.
     """
-    DEFAULT_MAX_SEQ_LENGTH = 140
-    DEFAULT_BATCH_SIZE = 16
-    DEFAULT_BUFFER_SIZE = 10000
-    DEFAULT_TEST_SIZE = 0.3
-    DEFAULT_RANDOM_STATE = 42
-    DEFAULT_MAX_TOKENS = 150
-    DEFAULT_REVERSE_INPUT_SEQ_BOOL = True
+    _DEFAULT_MAX_SEQ_LENGTH = 140
+    _DEFAULT_BATCH_SIZE = 16
+    _DEFAULT_BUFFER_SIZE = 10000
+    _DEFAULT_TEST_SIZE = 0.3
+    _DEFAULT_RANDOM_STATE = 42
+    _DEFAULT_MAX_TOKENS = 150
+    _DEFAULT_REVERSE_INPUT_SEQ_BOOL = True
 
     def __init__(
         self,
@@ -49,13 +50,13 @@ class DataLoader:
         validation_split: float,
         logger: logging.Logger,
         num_samples: Optional[int] = None,
-        max_encoder_seq_length: int = DEFAULT_MAX_SEQ_LENGTH,
-        max_decoder_seq_length: int = DEFAULT_MAX_SEQ_LENGTH,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        buffer_size: int = DEFAULT_BUFFER_SIZE,
-        random_state: int = DEFAULT_RANDOM_STATE,
-        max_tokens: int = DEFAULT_MAX_TOKENS,
-        reverse_input_sequence: bool = DEFAULT_REVERSE_INPUT_SEQ_BOOL
+        max_encoder_seq_length: int = _DEFAULT_MAX_SEQ_LENGTH,
+        max_decoder_seq_length: int = _DEFAULT_MAX_SEQ_LENGTH,
+        batch_size: int = _DEFAULT_BATCH_SIZE,
+        buffer_size: int = _DEFAULT_BUFFER_SIZE,
+        random_state: int = _DEFAULT_RANDOM_STATE,
+        max_tokens: int = _DEFAULT_MAX_TOKENS,
+        reverse_input_sequence: bool = _DEFAULT_REVERSE_INPUT_SEQ_BOOL
     ) -> None:
         self._products_file = products_file
         self._reactants_file = reactants_file
@@ -107,6 +108,7 @@ class DataLoader:
         self._test_dataset_size = None
 
         self._token_counts = None
+        self._train_steps_per_epoch = None
 
     def load_and_prepare_data(self) -> None:
         """
@@ -234,6 +236,10 @@ class DataLoader:
 
         # Extract token frequencies
         self._smiles_tokeniser.calculate_token_frequencies(combined_tokenised_train_data)
+
+        # Extract and log number of training steps per epoch
+        self._train_steps_per_epoch = int(round(len(self._tokenised_products_x_train_data) / self._batch_size))
+        self._logger.info(f'Training steps per epoch; {self._train_steps_per_epoch }')
 
     def _preprocess_tokenised_datasets(self) -> None:
         """
@@ -451,3 +457,15 @@ class DataLoader:
             Random state seed.
         """
         return self._random_state
+
+    @property
+    def train_steps_per_epoch(self) -> int:
+        """
+        Returns the number of training steps per epoch
+
+        Returns
+        -------
+        int
+            Training steps per epoch.
+        """
+        return self._train_steps_per_epoch

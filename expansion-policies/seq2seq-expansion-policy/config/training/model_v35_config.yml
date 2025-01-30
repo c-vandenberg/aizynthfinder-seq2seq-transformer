@@ -59,10 +59,10 @@ data:
   logger_path: '../var/log/liu-et-al-ord-concatenated/model-v35/model-v35.log'
   max_encoder_seq_length: 140
   max_decoder_seq_length: 140
-  batch_size: 64
+  batch_size: 32
   test_split: 0.1
   validation_split: 0.1
-  max_tokens: 150
+  max_tokens: 350
   use_weighted_loss: False
   random_state: 4
 
@@ -79,7 +79,7 @@ model:
   beam_width: 5
   weight_decay: null
   dropout_rate: 0.2
-  learning_rate: 0.001
+  learning_rate: 0.0001
 
 # Training Configuration and Hyperparameters
 training:

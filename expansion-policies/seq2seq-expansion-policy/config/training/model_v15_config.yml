@@ -5,7 +5,7 @@
 # - Update config file to specify number of encoder and decoder layers for greater model architecture flexibility.
 # - Implement BLEU score, training log perplexity, validation log perplexity and testing log perplexity:
 #     - Perplexity:
-#       - Perplexity is a common metric used in natural langauge processing (NPL) to evaluate how well a probabilistic
+#       - Perplexity is a common metric used in natural language processing (NLP) to evaluate how well a probabilistic
 #         model predicts a sample. In the context of seq2seq models, perplexity measures the model's ability to predict
 #         the next word (or token) in a sequence given the preceding words (or tokens).
 #       - A lower perplexity indicates  that the model is better at predicting the sample. It means the model assigns
@@ -54,7 +54,7 @@
 #     - Validation Accuracy: 0.636
 #     - Difference: +0.018 (+2.91%)
 #
-#       - An increase of +2.91% from training to validation indicates that the model still generalizes well to unseen
+#       - An increase of +2.91% from training to validation indicates that the model still generalises well to unseen
 ##        data without overfitting.
 #
 #     - Train Loss: 0.365
@@ -62,10 +62,10 @@
 #     - Difference: -0.076 (-20.82%)
 #
 #       - A decrease of -20.64% for loss from training to validation is a significant improvement. An improvement on
-##        validation loss from accuracy loss is a positive sign of generalization, suggesting the model is effectively
+##        validation loss from accuracy loss is a positive sign of generalisation, suggesting the model is effectively
 ##        learning.
 ##      - After reading into this further, such a significant drop could also mean that the training process isn't
-##        adequately optimizing the model. A review could be conducted to review this, and to ensure there isn't
+##        adequately optimising the model. Further investigation could be conducted to ensure there isn't
 ##        any data leakage.
 #
 #     - Train Perplexity: 1.45
@@ -74,7 +74,7 @@
 #
 #       - A reduction of -7.59% in validation perplexity from training perplexity indicates the model is better at
 ##        predicting the validation set, aligning with the observed increase in validation accuracy. This further
-##        underscores the effective learning and generalization of the model
+##        underscores the effective learning and generalisation of the model
 #
 # 2. Validation vs Testing Accuracy, Loss, Perplexity and BLEU Score:
 #   - Validation Accuracy: 0.636
@@ -83,7 +83,7 @@
 #
 #     - An increase of +2.36% from validation to testing accuracy indicates that the model maintains or slightly
 #       improves its performance on the test set.
-#     - Consistency between validation and testing performance reinforces the model's ability to generalize well
+#     - Consistency between validation and testing performance reinforces the model's ability to generalise well
 #       to new, unseen data.
 #
 #   - Validation Loss: 0.289
@@ -91,7 +91,7 @@
 #   - Difference: -0.059 (-20.42%)
 #
 #     - A substantial decrease of -20.48% from validation to testing loss indicates that the model not only maintains
-#       but also slightly improves its performance on unseen data and is effectively generalizing its learned patterns
+#       but also slightly improves its performance on unseen data and is effectively generalising its learned patterns
 #       to new data.
 #
 #   - Validation Perplexity: 1.34
@@ -99,7 +99,7 @@
 #   - Difference: -0.0800 (-5.97%)
 #
 #     - A decrease of -5.97% in testing perplexity compared to validation perplexity further indicates that the model
-#       is better at predicting unseen data, underscoring its capability to generalize beyond the validation data set.
+#       is better at predicting unseen data, underscoring its capability to generalise beyond the validation data set.
 #
 #   - Validation BLEU Score: 0.0196
 #   - Testing BLEU Score: 0.0210

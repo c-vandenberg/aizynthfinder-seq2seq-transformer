@@ -8,14 +8,14 @@
 # Training run metrics:
 #   - Epochs: 50
 #
-#   - Train Loss (Smoothed):
-#   - Train Accuracy (Smoothed):
-#   - Train Perplexity (Smoothed):
+#   - Train Loss (Smoothed): 0.0458
+#   - Train Accuracy (Smoothed): 0.687
+#   - Train Perplexity (Smoothed): 1.048
 #
-#   - Validation Loss (Smoothed):
-#   - Validation Accuracy (Smoothed):
-#   - Validation Perplexity (Smoothed):
-#   - Validation BLEU Score (Smoothed):
+#   - Validation Loss (Smoothed): 0.0735
+#   - Validation Accuracy (Smoothed): 0.681
+#   - Validation Perplexity (Smoothed): 0.108
+#   - Validation BLEU Score (Smoothed): 0.0342
 #
 #   - Test Loss (Smoothed):
 #   - Test Accuracy (Smoothed):

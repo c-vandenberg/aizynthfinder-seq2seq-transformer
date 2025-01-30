@@ -50,7 +50,7 @@
 #   - Both loss and accuracy for training, testing and validation are comparable, with model V14 showing marginal
 #     improvement in training vs validation metrics, and validation vs testing metrics.
 #   - Convergence is similar for both models, however the reduced number of layers for model V14 resulted in a reduction
-#     in epoch time length of 1/2 (~1 h vs ~2h for model V131).
+#     in epoch time length of 1/2 (~1 h vs ~2h for model V13).
 #   - Conclusion: Maintain encoder number of layers at 2 as per Liu et al. model.
 
 # Data Configuration and Hyperparameters

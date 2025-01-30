@@ -17,6 +17,7 @@ from tensorflow.train import Checkpoint, CheckpointManager
 from data.utils.logging_utils import configure_logger
 from losses.losses import WeightedSparseCategoricalCrossEntropy
 from metrics.smiles_string_metrics import SmilesStringMetrics
+from schedulers.learning_rate import WarmupThenDecaySchedule
 from trainers.environment import TrainingEnvironment
 from callbacks.checkpoints import BestValLossCallback
 from callbacks.validation_metrics import ValidationMetricsCallback
@@ -36,7 +37,7 @@ class Trainer:
     Trainer class for training and evaluating the Retrosynthesis Seq2Seq model.
 
     This class handles the setup of the environment, data loading, model
-    initialization, training, evaluation, and saving of the model.
+    initialisation, training, evaluation, and saving of the model.
     """
     def __init__(self, config_path: str) -> None:
         """
@@ -201,17 +202,19 @@ class Trainer:
         """
         model_conf: Dict[str, Any] = self._config.get('model', {})
         data_conf: Dict[str, Any] = self._config.get('data', {})
+        train_conf: Dict[str, Any] = self._config.get('training', {})
 
-        # Retrieve model parameters with defaults
+        # Retrieve model and training parameters with defaults
         encoder_embedding_dim: int = model_conf.get('encoder_embedding_dim', 256)
         decoder_embedding_dim: int = model_conf.get('decoder_embedding_dim', 256)
         units: int = model_conf.get('units', 256)
         attention_dim: int = model_conf.get('attention_dim', 256)
         encoder_num_layers: int = model_conf.get('encoder_num_layers', 2)
         decoder_num_layers: int = model_conf.get('decoder_num_layers', 4)
-        dropout_rate: float = model_conf.get('dropout_rate', 0.2)
-        weight_decay: Union[float, None] = model_conf.get('weight_decay', None)
-        learning_rate: float = model_conf.get('learning_rate', 0.0001)
+        dropout_rate: float = train_conf.get('dropout_rate', 0.2)
+        weight_decay: Union[float, None] = train_conf.get('weight_decay', None)
+        lr_scheduler: str = train_conf.get('lr_scheduler', 'reduce_on_plateau')
+        initial_lr: float = float(train_conf.get('initial_lr', 1e-4))
 
         # Initialise the model
         self._model: RetrosynthesisSeq2SeqModel = RetrosynthesisSeq2SeqModel(
@@ -227,6 +230,20 @@ class Trainer:
             dropout_rate=dropout_rate,
             weight_decay=weight_decay
         )
+
+        if lr_scheduler == 'warmup_then_decay':
+            total_steps: int = self._data_loader.train_steps_per_epoch * train_conf.get('epochs', 10)
+            lr_warmup_ratio: float = model_conf.get('lr_warmup_ratio', 0.05)
+            lr_decay_ratio: float = model_conf.get('lr_decay_ratio', 0.80)
+            lr_decay_factor: float = train_conf.get('lr_decay_factor', 0.1)
+            learning_rate = WarmupThenDecaySchedule(
+                initial_lr=initial_lr,
+                warmup_steps=int(total_steps * lr_warmup_ratio),
+                decay_steps=int(total_steps * lr_decay_ratio),
+                final_decay_rate=lr_decay_factor
+            )
+        else:
+            learning_rate = initial_lr
 
         # Set up the optimiser
         self._optimizer: Adam = Adam(learning_rate=learning_rate, clipnorm=5.0)
@@ -311,17 +328,17 @@ class Trainer:
         KeyError
             If required training configuration keys are missing.
         """
-        training_conf: Dict[str, Any] = self._config.get('training', {})
+        train_conf: Dict[str, Any] = self._config.get('training', {})
 
         # Early Stopping
         early_stopping: EarlyStopping = EarlyStopping(
             monitor='val_loss',
-            patience=training_conf.get('patience', 5),
+            patience=train_conf.get('patience', 5),
             restore_best_weights=True
         )
 
         # Checkpoint manager
-        checkpoint_dir = training_conf.get('checkpoint_dir', './checkpoints')
+        checkpoint_dir = train_conf.get('checkpoint_dir', './checkpoints')
         os.makedirs(checkpoint_dir, exist_ok=True)
         checkpoint: Checkpoint = Checkpoint(model=self._model, optimizer=self._optimizer)
         checkpoint_manager: CheckpointManager = CheckpointManager(
@@ -342,16 +359,9 @@ class Trainer:
             checkpoint_manager
         )
 
-        # Learning Rate Scheduler
-        lr_scheduler: ReduceLROnPlateau = ReduceLROnPlateau(
-            monitor='val_loss',
-            factor=0.1,
-            patience=3
-        )
-
         # Validation metrics callback
-        valid_metrics_dir: str = training_conf.get('valid_metrics_dir', './validation-metrics')
-        tensorboard_dir: str = training_conf.get('tensorboard_dir', './tensorboard')
+        valid_metrics_dir: str = train_conf.get('valid_metrics_dir', './validation-metrics')
+        tensorboard_dir: str = train_conf.get('tensorboard_dir', './tensorboard')
         validation_metrics_callback: ValidationMetricsCallback = ValidationMetricsCallback(
             tokenizer=self._tokeniser,
             validation_data=self._data_loader.get_valid_dataset(),
@@ -374,10 +384,24 @@ class Trainer:
         self._callbacks = [
             early_stopping,
             best_val_loss_checkpoint_callback,
-            lr_scheduler,
             validation_metrics_callback,
             tensorboard_callback
         ]
+
+        lr_scheduler: str = train_conf.get('lr_scheduler', 'reduce_on_plateau')
+
+        if lr_scheduler == 'reduce_on_plateau':
+            lr_decay_factor: float = train_conf.get('lr_decay_factor', 0.1)
+            lr_reduce_patience: int = train_conf.get('lr_reduce_patience', 3)
+
+            # Reduce on plateau learning Rate Scheduler
+            lr_scheduler: ReduceLROnPlateau = ReduceLROnPlateau(
+                monitor='val_loss',
+                factor=lr_decay_factor,
+                patience=lr_reduce_patience
+            )
+
+            self._callbacks.append(lr_scheduler)
 
     def _train(self) -> None:
         """
