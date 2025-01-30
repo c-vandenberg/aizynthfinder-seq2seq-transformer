@@ -55,8 +55,8 @@
 data:
   products_file: '../data/preprocessed/liu-et-al-ord-concatenated/products_smiles_cleaned_smarts'
   reactants_file: '../data/preprocessed/liu-et-al-ord-concatenated/reactants_smiles_cleaned_smarts'
-  tokenizer_save_path: '../data/training/liu-et-al-ord-concatenated/model-v36/tokenizer/model_v36_tokenizer.json'
-  logger_path: '../var/log/liu-et-al-ord-concatenated/model-v36/model-v36.log'
+  tokenizer_save_path: '../data/training/liu-et-al-ord-concatenated/model-v42/tokenizer/model_v42_tokenizer.json'
+  logger_path: '../var/log/liu-et-al-ord-concatenated/model-v42/model-v42.log'
   max_encoder_seq_length: 140
   max_decoder_seq_length: 140
   batch_size: 32
@@ -77,22 +77,27 @@ model:
   encoder_num_layers: 2
   decoder_num_layers: 4
   beam_width: 5
-  weight_decay: null
-  dropout_rate: 0.2
-  learning_rate: 0.0001
 
 # Training Configuration and Hyperparameters
 training:
   epochs: 20
-  patience: 5
+  early_stop_patience: 5
   reverse_tokenized_input_sequence: True
-  model_save_path: '../data/training/liu-et-al-ord-concatenated/model-v36/model/saved_model'
-  model_save_dir: '../data/training/liu-et-al-ord-concatenated/model-v36/model'
-  valid_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v36/validation-metrics'
-  test_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v36/testing-metrics'
-  tensorboard_dir: '../data/training/liu-et-al-ord-concatenated/model-v36/tensorboard'
-  log_dir: '../logs/liu-et-al-ord-concatenated/model-v36'
-  checkpoint_dir: '../data/training/liu-et-al-ord-concatenated/model-v36/checkpoints'
+  weight_decay: null
+  dropout_rate: 0.2
+  lr_scheduler: warmup_then_decay
+  initial_lr: 1e-3
+  lr_decay_factor: 0.1
+  lr_warmup_ratio: 0.05
+  lr_decay_ratio: 0.80
+  lr_reduce_patience: 3
+  model_save_path: '../data/training/liu-et-al-ord-concatenated/model-v42/model/saved_model'
+  model_save_dir: '../data/training/liu-et-al-ord-concatenated/model-v42/model'
+  valid_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v42/validation-metrics'
+  test_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v42/testing-metrics'
+  tensorboard_dir: '../data/training/liu-et-al-ord-concatenated/model-v42/tensorboard'
+  log_dir: '../logs/liu-et-al-ord-concatenated/model-v42'
+  checkpoint_dir: '../data/training/liu-et-al-ord-concatenated/model-v42/checkpoints'
   num_samples: null # Number of samples to use for debugging model
   test_subset_fraction: 0.01
 
