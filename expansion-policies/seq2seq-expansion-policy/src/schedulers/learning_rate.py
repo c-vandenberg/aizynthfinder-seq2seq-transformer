@@ -56,3 +56,47 @@ class WarmupThenDecaySchedule(tf.keras.optimizers.schedules.LearningRateSchedule
             "decay_steps": self.decay_steps,
             "final_decay_rate": self.final_decay_rate
         }
+
+
+@tf.keras.utils.register_keras_serializable()
+class VaswaniLRSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+    """
+    Implements the learning rate schedule from "Attention is All You Need" (Vaswani et al.).
+
+    The formula is:
+        lrate(step) = d_model^{-0.5} * min(step^{-0.5}, step * warmup_steps^{-1.5})
+
+    where `step` is the current training step, `warmup_steps` is a constant (e.g. 4000),
+    and `d_model` is the dimensionality of your model's embeddings.
+
+    Example:
+        schedule = TransformerLRSchedule(d_model=512, warmup_steps=4000)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=schedule, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
+    """
+
+    def __init__(self, d_model, warmup_steps=4000):
+        super().__init__()
+        self.d_model = d_model
+        self.warmup_steps = float(warmup_steps)
+        self.d_model_factor = d_model ** -0.5  # = 1 / sqrt(d_model)
+
+    def __call__(self, step):
+        """Compute the LR as a function of the current optimizer step (int)."""
+        step_float = tf.cast(step, tf.float32)
+
+        # arg1 = step^{-0.5}
+        arg1 = tf.pow(step_float, -0.5)
+
+        # arg2 = step * warmup_steps^{-1.5}
+        #      = step / (warmup_steps^{1.5})
+        arg2 = step_float * tf.pow(self.warmup_steps, -1.5)
+
+        # final LR = d_model^{-0.5} * min(arg1, arg2)
+        lr = self.d_model_factor * tf.minimum(arg1, arg2)
+        return lr
+
+    def get_config(self):
+        return {
+            "d_model": self.d_model,
+            "warmup_steps": self.warmup_steps
+        }
