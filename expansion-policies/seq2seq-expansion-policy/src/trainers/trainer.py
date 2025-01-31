@@ -5,6 +5,7 @@ from typing import Dict, Any, List, Tuple, Union, Callable, Optional
 
 import yaml
 import tensorflow as tf
+import tensorflow_addons as tfa
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import (
     Callback,
@@ -215,6 +216,7 @@ class Trainer:
         weight_decay: Union[float, None] = train_conf.get('weight_decay', None)
         lr_scheduler: str = train_conf.get('lr_scheduler', 'reduce_on_plateau')
         initial_lr: float = float(train_conf.get('initial_lr', 1e-4))
+        lr_scheduler_confs: Dict = train_conf.get('lr_scheduler_configs', {})
 
         # Initialise the model
         self._model: RetrosynthesisSeq2SeqModel = RetrosynthesisSeq2SeqModel(
@@ -232,23 +234,39 @@ class Trainer:
         )
 
         if lr_scheduler == 'warmup_then_decay':
+            self._logger.info('Optimiser using "warm up then decay" learning rate scheduler.')
+            lr_warmup_decay_conf: Dict = lr_scheduler_confs.get('warmup_then_decay', {})
             total_steps: int = self._data_loader.train_steps_per_epoch * train_conf.get('epochs', 10)
-            lr_warmup_ratio: float = model_conf.get('lr_warmup_ratio', 0.05)
-            lr_decay_ratio: float = model_conf.get('lr_decay_ratio', 0.80)
-            lr_decay_factor: float = train_conf.get('lr_decay_factor', 0.1)
+            lr_warmup_ratio: float = lr_warmup_decay_conf.get('lr_warmup_ratio', 0.05)
+            lr_decay_ratio: float = lr_warmup_decay_conf.get('lr_decay_ratio', 0.80)
+            lr_decay_factor: float = lr_warmup_decay_conf.get('lr_decay_factor', 0.1)
 
-            learning_rate = VaswaniLRSchedule(
-                d_model=encoder_embedding_dim,
-                warmup_steps=float(total_steps * lr_warmup_ratio)
+            ##learning_rate = VaswaniLRSchedule(
+            ##    d_model=encoder_embedding_dim,
+            ##    warmup_steps=float(total_steps * lr_warmup_ratio)
+            ##)
+
+            learning_rate = WarmupThenDecaySchedule(
+                initial_lr=initial_lr,
+                warmup_steps=int(total_steps * lr_warmup_ratio),
+                decay_steps=int(total_steps * lr_decay_ratio),
+                final_decay_rate=lr_decay_factor
+            )
+        elif lr_scheduler == 'cyclical':
+            self._logger.info('Optimiser using cyclical learning rate scheduler.')
+            lr_cyclical_conf: Dict = lr_scheduler_confs.get('cyclical', {})
+            maximal_lr: float = float(lr_cyclical_conf.get('maximal_lr', 1e-3))
+
+            # One cycle per epoch (ramp up during the first half of the epoch, then ramp down during the second half)
+            learning_rate = tfa.optimizers.CyclicalLearningRate(
+                initial_learning_rate=initial_lr,
+                maximal_learning_rate=maximal_lr,
+                scale_fn=lambda x: 1.0,
+                step_size=self._data_loader.train_steps_per_epoch / 2
             )
 
-            ## learning_rate = WarmupThenDecaySchedule(
-            ##    initial_lr=initial_lr,
-            ##    warmup_steps=int(total_steps * lr_warmup_ratio),
-            ##    decay_steps=int(total_steps * lr_decay_ratio),
-            ##    final_decay_rate=lr_decay_factor
-            ##)
         else:
+            self._logger.info('Optimiser using static learning rate.')
             learning_rate = initial_lr
 
         # Set up the optimiser
@@ -335,6 +353,7 @@ class Trainer:
             If required training configuration keys are missing.
         """
         train_conf: Dict[str, Any] = self._config.get('training', {})
+        lr_scheduler_confs: Dict = train_conf.get('lr_scheduler_configs', {})
 
         # Early Stopping
         early_stopping: EarlyStopping = EarlyStopping(
@@ -397,13 +416,14 @@ class Trainer:
         lr_scheduler: str = train_conf.get('lr_scheduler', 'reduce_on_plateau')
 
         if lr_scheduler == 'reduce_on_plateau':
-            lr_decay_factor: float = train_conf.get('lr_decay_factor', 0.1)
-            lr_reduce_patience: int = train_conf.get('lr_reduce_patience', 3)
+            lr_reduce_on_plateau_conf: Dict = lr_scheduler_confs.get('reduce_on_plateau', {})
+            lr_reduction_factor: float = lr_reduce_on_plateau_conf.get('lr_reduction_factor', 0.1)
+            lr_reduce_patience: int = lr_reduce_on_plateau_conf.get('lr_reduce_patience', 3)
 
             # Reduce on plateau learning Rate Scheduler
             lr_scheduler: ReduceLROnPlateau = ReduceLROnPlateau(
                 monitor='val_loss',
-                factor=lr_decay_factor,
+                factor=lr_reduction_factor,
                 patience=lr_reduce_patience
             )
 
