@@ -256,13 +256,14 @@ class Trainer:
             self._logger.info('Optimiser using cyclical learning rate scheduler.')
             lr_cyclical_conf: Dict = lr_scheduler_confs.get('cyclical', {})
             maximal_lr: float = float(lr_cyclical_conf.get('maximal_lr', 1e-3))
+            num_half_cycles_per_epoch: int = int(2 * lr_cyclical_conf.get('num_cycles_per_epoch', 1))
 
             # One cycle per epoch (ramp up during the first half of the epoch, then ramp down during the second half)
             learning_rate = tfa.optimizers.CyclicalLearningRate(
                 initial_learning_rate=initial_lr,
                 maximal_learning_rate=maximal_lr,
                 scale_fn=lambda x: 1.0,
-                step_size=self._data_loader.train_steps_per_epoch / 2
+                step_size=round(self._data_loader.train_steps_per_epoch / num_half_cycles_per_epoch)
             )
 
         else:
