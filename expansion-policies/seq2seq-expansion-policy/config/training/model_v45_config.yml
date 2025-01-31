@@ -80,7 +80,7 @@ model:
 
 # Training Configuration and Hyperparameters
 training:
-  epochs: 5
+  epochs: 1
   early_stop_patience: 5
   reverse_tokenized_input_sequence: True
   weight_decay: null
@@ -97,6 +97,7 @@ training:
       lr_decay_ratio: 0.80
     cyclical:
       maximal_lr: 1e-3
+      num_cycles_per_epoch: 1
   model_save_path: '../data/training/liu-et-al-ord-concatenated/model-v45/model/saved_model'
   model_save_dir: '../data/training/liu-et-al-ord-concatenated/model-v45/model'
   valid_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v45/validation-metrics'

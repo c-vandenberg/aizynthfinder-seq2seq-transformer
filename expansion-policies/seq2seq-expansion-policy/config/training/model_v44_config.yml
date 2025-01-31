@@ -97,7 +97,6 @@ training:
       lr_decay_ratio: 0.80
     cyclical:
       maximal_lr: 1e-3
-      num_cycles_per_epoch: 1
   model_save_path: '../data/training/liu-et-al-ord-concatenated/model-v44/model/saved_model'
   model_save_dir: '../data/training/liu-et-al-ord-concatenated/model-v44/model'
   valid_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v44/validation-metrics'
@@ -105,7 +104,7 @@ training:
   tensorboard_dir: '../data/training/liu-et-al-ord-concatenated/model-v44/tensorboard'
   log_dir: '../logs/liu-et-al-ord-concatenated/model-v44'
   checkpoint_dir: '../data/training/liu-et-al-ord-concatenated/model-v44/checkpoints'
-  num_samples: 100 # Number of samples to use for debugging model
+  num_samples: null # Number of samples to use for debugging model
   test_subset_fraction: 0.01
 
 # Environment Configuration
