@@ -18,7 +18,7 @@ from tensorflow.train import Checkpoint, CheckpointManager
 from data.utils.logging_utils import configure_logger
 from losses.losses import WeightedSparseCategoricalCrossEntropy
 from metrics.smiles_string_metrics import SmilesStringMetrics
-from schedulers.learning_rate import WarmupThenDecaySchedule, VaswaniLRSchedule
+from schedulers.learning_rate import WarmupDecaySchedule, VaswaniWarmupDecaySchedule
 from trainers.environment import TrainingEnvironment
 from callbacks.checkpoints import BestValLossCallback
 from callbacks.validation_metrics import ValidationMetricsCallback
@@ -246,7 +246,7 @@ class Trainer:
             ##    warmup_steps=float(total_steps * lr_warmup_ratio)
             ##)
 
-            learning_rate = WarmupThenDecaySchedule(
+            learning_rate = WarmupDecaySchedule(
                 initial_lr=initial_lr,
                 warmup_steps=int(total_steps * lr_warmup_ratio),
                 decay_steps=int(total_steps * lr_decay_ratio),

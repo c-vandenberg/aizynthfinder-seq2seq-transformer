@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 @tf.keras.utils.register_keras_serializable()
-class WarmupThenDecaySchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+class WarmupDecaySchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     def __init__(
         self,
         initial_lr: float = 1e-4,
@@ -59,7 +59,7 @@ class WarmupThenDecaySchedule(tf.keras.optimizers.schedules.LearningRateSchedule
 
 
 @tf.keras.utils.register_keras_serializable()
-class VaswaniLRSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+class VaswaniWarmupDecaySchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     """
     Implements the learning rate schedule from "Attention is All You Need" (Vaswani et al.).
 
