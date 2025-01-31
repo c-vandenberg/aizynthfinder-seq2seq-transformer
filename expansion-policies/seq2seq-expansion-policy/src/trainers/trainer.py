@@ -250,7 +250,7 @@ class Trainer:
                 initial_lr=initial_lr,
                 warmup_steps=int(total_steps * lr_warmup_ratio),
                 decay_steps=int(total_steps * lr_decay_ratio),
-                final_decay_rate=lr_decay_factor
+                final_decay_factor=lr_decay_factor
             )
         elif lr_scheduler == 'cyclical':
             self._logger.info('Optimiser using cyclical learning rate scheduler.')
