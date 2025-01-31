@@ -439,9 +439,9 @@ class StackedLSTMDecoder(DecoderInterface):
 
     def get_config(self):
         """
-        Returns the configuration of the layer for serialization.
+        Returns the configuration of the layer for serialisation.
 
-        This method enables the layer to be serialized and deserialized with its
+        This method enables the layer to be serialised and de-serialised with its
         configuration parameters, facilitating model saving and loading.
 
         Returns
