@@ -97,7 +97,7 @@ training:
       lr_decay_ratio: 0.80
     cyclical:
       maximal_lr: 1e-3
-      num_cycles_per_epoch: 3
+      num_cycles_per_epoch: 1
   model_save_path: '../data/training/liu-et-al-ord-concatenated/model-v48/model/saved_model'
   model_save_dir: '../data/training/liu-et-al-ord-concatenated/model-v48/model'
   valid_metrics_dir: '../data/training/liu-et-al-ord-concatenated/model-v48/validation-metrics'
