@@ -1,6 +1,6 @@
 # Seq2Seq Model Architecture
 
-# Epochs: 100
+# Epochs: 10
 
 # Data Configuration and Hyperparameters
 data:
