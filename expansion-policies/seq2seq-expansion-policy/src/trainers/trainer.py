@@ -258,13 +258,13 @@ class Trainer:
             maximal_lr: float = float(lr_cyclical_conf.get('maximal_lr', 1e-3))
             num_half_cycles_per_epoch: int = int(2 * lr_cyclical_conf.get('num_cycles_per_epoch', 1))
 
-            def cyclical_lr_scheduler_scale_fn(x):
-                return 1.0
+            def cyclical_lr_scheduler_decay_amp_scale_fn(cycle_index):
+                return 1.0 / (2.0 ** (cycle_index - 1))
 
             learning_rate = tfa.optimizers.CyclicalLearningRate(
                 initial_learning_rate=initial_lr,
                 maximal_learning_rate=maximal_lr,
-                scale_fn=cyclical_lr_scheduler_scale_fn,
+                scale_fn=cyclical_lr_scheduler_decay_amp_scale_fn,
                 step_size=round(self._data_loader.train_steps_per_epoch / num_half_cycles_per_epoch)
             )
 
