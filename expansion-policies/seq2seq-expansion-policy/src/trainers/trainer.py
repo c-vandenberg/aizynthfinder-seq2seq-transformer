@@ -18,11 +18,12 @@ from tensorflow.train import Checkpoint, CheckpointManager
 from data.utils.logging_utils import configure_logger
 from losses.losses import WeightedSparseCategoricalCrossEntropy
 from metrics.smiles_string_metrics import SmilesStringMetrics
-from schedulers.learning_rate import WarmupDecaySchedule, VaswaniWarmupDecaySchedule
+from schedulers.learning_rate import WarmupDecaySchedule
 from trainers.environment import TrainingEnvironment
 from callbacks.checkpoints import BestValLossCallback
 from callbacks.validation_metrics import ValidationMetricsCallback
 from callbacks.gradient_monitoring import GradientMonitoringCallback
+from callbacks.learning_rate import LearningRateGlobalStepLogger
 from metrics.perplexity import Perplexity
 from data.utils.data_loader import DataLoader
 from data.utils.tokenisation import SmilesTokeniser
@@ -258,14 +259,17 @@ class Trainer:
             maximal_lr: float = float(lr_cyclical_conf.get('maximal_lr', 1e-3))
             num_half_cycles_per_epoch: int = int(2 * lr_cyclical_conf.get('num_cycles_per_epoch', 1))
 
-            def cyclical_lr_scheduler_decay_amp_scale_fn(cycle_index):
+            def clr_constant_amplitude_scale_fn(cycle_index) -> float:
+                return 1.0
+
+            def clr_decay_amplitude_scale_fn(cycle_index) -> float:
                 return 1.0 / (2.0 ** (cycle_index - 1))
 
             learning_rate = tfa.optimizers.CyclicalLearningRate(
                 initial_learning_rate=initial_lr,
                 maximal_learning_rate=maximal_lr,
-                scale_fn=cyclical_lr_scheduler_decay_amp_scale_fn,
-                step_size=round(self._data_loader.train_steps_per_epoch / num_half_cycles_per_epoch)
+                scale_fn=clr_constant_amplitude_scale_fn,
+                step_size=self._data_loader.train_steps_per_epoch / num_half_cycles_per_epoch
             )
 
         else:
@@ -361,8 +365,9 @@ class Trainer:
         # Early Stopping
         early_stopping: EarlyStopping = EarlyStopping(
             monitor='val_loss',
-            patience=train_conf.get('patience', 5),
-            restore_best_weights=True
+            patience=train_conf.get('early_stop_patience', 5),
+            restore_best_weights=True,
+            min_delta=1e-4
         )
 
         # Checkpoint manager
@@ -404,6 +409,11 @@ class Trainer:
             log_dir=tensorboard_dir
         )
 
+        # Log learning rate as a function of global steps
+        # This is particularly useful for visualising learning rate changes when using
+        # `tfa.optimizers.CyclicalLearningRate`, where one or more learning rate cycles take place within each epoch
+        lr_global_step_logger = LearningRateGlobalStepLogger(log_dir=f"{tensorboard_dir}/lr_logs")
+
         # Gradient monitoring
         gradient_callback = GradientMonitoringCallback(
             log_dir=os.path.join(tensorboard_dir, 'gradients')
@@ -413,7 +423,8 @@ class Trainer:
             early_stopping,
             best_val_loss_checkpoint_callback,
             validation_metrics_callback,
-            tensorboard_callback
+            tensorboard_callback,
+            lr_global_step_logger
         ]
 
         lr_scheduler: str = train_conf.get('lr_scheduler', 'reduce_on_plateau')
