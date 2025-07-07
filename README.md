@@ -6,7 +6,7 @@ Retrosynthetic analysis and reaction prediction are fundamental for efficient ch
 
 A leading CASP tool, [AiZynthFinder](https://github.com/MolecularAI/aizynthfinder), achieves retrosynthesis prediction by generating a retrosynthetic search tree using a template-based, feedforward neural network (FNN) model known as the expansion policy to give a ranked list of reaction templates. This process is followed by another neural network, the filter policy, which removes unfeasible reactions. Once the retrosynthesis search tree is constructed, a Monte Carlo Tree Search (MCTS) algorithm traverses the search tree to identify the best synthetic routes.
 
-To enhance AiZynthFinder, this study integrates SMILES-based and attention-based encoder-decoder and transformer models into its expansion policy. By leveraging these advanced neural network architectures with SMILES-based chemical representations, we aim to overcome the inherent limitations of template-based retrosynthetic methods. The integration seeks to broaden accurate predictions beyond the rule-based knowledge base, and ensure that predictions consider the entire molecular environment and account for stereochemistry.
+To enhance AiZynthFinder, this study integrates SMILES-based and attention-based encoder-decoder (Seq2Seq) and transformer models into its expansion policy. By leveraging these advanced neural network architectures with SMILES-based chemical representations, we aim to overcome the inherent limitations of template-based retrosynthetic methods. The integration seeks to broaden accurate predictions beyond the rule-based knowledge base, and ensure that predictions consider the entire molecular environment and account for stereochemistry.
 
 This study is ongoing, involving continuous model optimisations and research. The results and discussion for the latest Seq2Seq model are available [here](https://github.com/c-vandenberg/aizynthfinder-project/blob/master/expansion-policies/seq2seq-expansion-policy/src/models/README.md#55-results-and-discussion). Development of the transformer model is currently in progress.
 
@@ -44,7 +44,7 @@ This study is ongoing, involving continuous model optimisations and research. Th
   &nbsp; &nbsp; &nbsp; &nbsp; 2.5 [References](https://github.com/c-vandenberg/aizynthfinder-project/tree/master/expansion-policies#24-references)<br>
 </details>
 <details>
-  <summary><b>3. Sequence-to-Sequence Expansion Policy</b></summary>
+  <summary><b>3. Attention-Based Encoder-Decoder (Seq2Seq) Expansion Policy</b></summary>
   
   &nbsp; &nbsp; &nbsp; &nbsp; 3.1 [Limitations of Template-Based Retrosynthetic Methods](https://github.com/c-vandenberg/aizynthfinder-project/tree/master/expansion-policies/seq2seq-expansion-policy#31-limitations-of-template-based-retrosynthetic-methods)<br>
   &nbsp; &nbsp; &nbsp; &nbsp; 3.2 [Alternative SMILES-Based Retrosynthetic Methods](https://github.com/c-vandenberg/aizynthfinder-project/blob/master/expansion-policies/seq2seq-expansion-policy/README.md#32-alternative-smiles-based-retrosynthetic-methods)<br>
