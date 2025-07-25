@@ -44,7 +44,7 @@ This study is ongoing, involving continuous model optimisations and research. Th
   &nbsp; &nbsp; &nbsp; &nbsp; 2.5 [References](https://github.com/c-vandenberg/aizynthfinder-project/tree/master/expansion-policies#24-references)<br>
 </details>
 <details>
-  <summary><b>3. Attention-Based Encoder-Decoder (Seq2Seq) Expansion Policy</b></summary>
+  <summary><b>3. Sequence-to-Sequence Expansion Policy</b></summary>
   
   &nbsp; &nbsp; &nbsp; &nbsp; 3.1 [Limitations of Template-Based Retrosynthetic Methods](https://github.com/c-vandenberg/aizynthfinder-project/tree/master/expansion-policies/seq2seq-expansion-policy#31-limitations-of-template-based-retrosynthetic-methods)<br>
   &nbsp; &nbsp; &nbsp; &nbsp; 3.2 [Alternative SMILES-Based Retrosynthetic Methods](https://github.com/c-vandenberg/aizynthfinder-project/blob/master/expansion-policies/seq2seq-expansion-policy/README.md#32-alternative-smiles-based-retrosynthetic-methods)<br>
